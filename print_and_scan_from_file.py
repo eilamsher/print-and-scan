@@ -55,9 +55,15 @@ def main():
         num_retries = 0
         while not verify_scanned_data(scanned_data):
             if num_retries > 3:
-                break
+                action = show_scan_failure_popup()
+                if action == "rescan":
+                    num_retries = 0
+                    continue
+                elif action == "reprint":
+                    break
             scanned_data = scanner.read_batch_with_trigger(n_msg=2)
             num_retries += 1
+        
         if num_retries <= 3:
             ind += 1
 
