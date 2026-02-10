@@ -55,7 +55,9 @@ def main():
         num_retries = 0
         while not verify_scanned_data(scanned_data):
             if num_retries > 3:
+                scanner.disconnect()
                 action = show_scan_failure_popup()
+                scanner.reconnect()
                 if action == "rescan":
                     num_retries = 0
                     continue
