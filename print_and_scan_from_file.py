@@ -1,10 +1,16 @@
 import csv
+from pathlib import Path
 import time
 import tkinter as tk
 from tkinter import filedialog
 
+from utils import load_json
 from wiliot_tools.test_equipment.test_equipment import CognexDataMan, ZebraPrinter
 
+
+DEFAULT_PRINTER_CONFIG = {"printer_name": "Zebra_Technologies_ZTC_ZT421-203dpi_ZPL","dpi": 203, "label_format_path": "",
+                          "label_width_in": 4, "label_height_in": 6, "label_gap_in": 0.2}
+PRINTER_CONFIG_PATH = Path(__file__).parent / "printer_config.json"
 
 def verify_scanned_data(scanned_data) -> bool:
     if len(scanned_data) != 2:
@@ -31,7 +37,6 @@ def show_scan_failure_popup() -> str:
     return result[0]
 
 def main():
-    label_format_path = ''
     csv_path = filedialog.askopenfilename(title="Please select a CSV print file")
     with open(csv_path, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
@@ -39,7 +44,8 @@ def main():
 
     scanner = CognexDataMan()
     scanner.reset()
-    printer_params = {"dpi": 203, "label_format_path": label_format_path, "label_content_path": csv_path, "starting_ind": 0, "label_width_in": 4, "label_height_in": 6, "label_gap_in": 0.2}
+    printer_params = load_json(PRINTER_CONFIG_PATH, DEFAULT_PRINTER_CONFIG)
+    printer_params["label_content_path"] = csv_path
     printer = ZebraPrinter(**printer_params)
     ind = 0
     while ind < len(label_content):
